@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia_LifeCycle.DataAccessEF;
 
 namespace SocialMedia_LifeCycle.Migrations
 {
     [DbContext(typeof(LifeCycleContext))]
-    partial class LifeCycleContextModelSnapshot : ModelSnapshot
+    [Migration("20210210161421_reenforced-user-data-annotations")]
+    partial class reenforceduserdataannotations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,9 +248,6 @@ namespace SocialMedia_LifeCycle.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Salt")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace SocialMedia_LifeCycle
 {
     using DataAccessEF;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using SocialMedia_LifeCycle.Domain.Services;
     using SocialMedia_LifeCycle.Shared.Services;
 
@@ -31,6 +32,12 @@ namespace SocialMedia_LifeCycle
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+            services.AddControllers();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            });
             services.AddDbContextPool<LifeCycleContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("LifeCycleContext")));
 
@@ -39,14 +46,15 @@ namespace SocialMedia_LifeCycle
             services.AddScoped<IPublicationService, PublicationService>();
             services.AddScoped<IInteractionService, InteractionService>();
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IAuthService, AuthService>();
 
-            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors(a => a
+                .SetIsOriginAllowed(o => true)
                 .AllowCredentials()
                 .AllowAnyHeader()
                 .AllowAnyMethod());

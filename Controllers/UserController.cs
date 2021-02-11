@@ -7,7 +7,7 @@ namespace SocialMedia_LifeCycle.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Shared.Services;
-    using SocialMedia_LifeCycle.Domain.Response;
+    using Params;
 
     public class UserController : _BaseLifeCycleController
    {
@@ -27,12 +27,18 @@ namespace SocialMedia_LifeCycle.Controllers
 
             try
             {
-                return Ok();
+                var user = authService.CreateNewAccount(userCredentials);
+                return Ok(authService.ToList());
             }
             catch (Exception ex)
             {
                 return Error("Algo deu errado!", ex);
             }
+        }
+
+        public IActionResult Get()
+        {
+            return Ok(authService.ToList());
         }
    }
 }

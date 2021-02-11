@@ -8,6 +8,8 @@ namespace SocialMedia_LifeCycle
 {
     using DataAccessEF;
     using Domain.Models;
+    using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+    using System.Security.Cryptography;
 
     public static class DatabaseSeeding
     {
@@ -47,7 +49,7 @@ namespace SocialMedia_LifeCycle
 
             if (!await context.Users.AnyAsync())
             {
-                var masterUser = new User()
+                var user = new User()
                 {
                     City = "Martinópolis",
                     State = "São Paulo",
@@ -60,8 +62,24 @@ namespace SocialMedia_LifeCycle
                     Explicit = true,
                     Login = "igor.pereira"                    
                 };
-                Console.WriteLine("helo");
-                context.Users.Add(masterUser);
+
+                var salt = new byte[128 / 8];
+                using var rng = RandomNumberGenerator.Create();
+                rng.GetBytes(salt);
+                var stringSalt = Convert.ToBase64String(salt);
+                Console.WriteLine(stringSalt);
+                var hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    user.Password,
+                    salt,
+                    KeyDerivationPrf.HMACSHA1,
+                    10000,
+                    256 / 8
+                    ));
+                Console.WriteLine(hashedPassword);
+
+                user.Password = hashedPassword;
+                user.Salt = stringSalt;
+                context.Users.Add(user);
 
                 await context.SaveChangesAsync();
             }
