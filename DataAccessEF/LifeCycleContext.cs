@@ -15,6 +15,7 @@ namespace SocialMedia_LifeCycle.DataAccessEF
         public DbSet<Relation> Relations { get; set; }
         public DbSet<Interaction> Interactions { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<RefreshTokenInfo> RefreshTokenInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,7 @@ namespace SocialMedia_LifeCycle.DataAccessEF
             modelBuilder.ApplyConfiguration(new Publication());   
             modelBuilder.ApplyConfiguration(new Interaction());   
             modelBuilder.ApplyConfiguration(new Comment());
+            modelBuilder.ApplyConfiguration(new RefreshTokenInfo());
         }
     }
 }

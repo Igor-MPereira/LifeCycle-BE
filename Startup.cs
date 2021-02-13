@@ -16,8 +16,10 @@ namespace SocialMedia_LifeCycle
 {
     using DataAccessEF;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.IdentityModel.Tokens;
     using SocialMedia_LifeCycle.Domain.Services;
     using SocialMedia_LifeCycle.Shared.Services;
+    using System.Text;
 
     public class Startup
     {
@@ -37,6 +39,19 @@ namespace SocialMedia_LifeCycle
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(config =>
+            {
+                config.RequireHttpsMetadata = false;
+                config.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetValue<string>("SecretKey")))
+                };
             });
             services.AddDbContextPool<LifeCycleContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("LifeCycleContext")));
@@ -53,21 +68,22 @@ namespace SocialMedia_LifeCycle
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseCors(a => a
                 .SetIsOriginAllowed(o => true)
                 .AllowCredentials()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -20,7 +20,7 @@ namespace SocialMedia_LifeCycle.Domain.Other
             StatusCode = statusCode;
         }
 
-        public LifeCycleException(HttpStatusCode statusCode, string message, Exception? innerException) : base(message, innerException) 
+        public LifeCycleException(HttpStatusCode statusCode, string message, Exception innerException) : base(message, innerException) 
         {
             StatusCode = statusCode;
         }

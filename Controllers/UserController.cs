@@ -8,6 +8,7 @@ namespace SocialMedia_LifeCycle.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Shared.Services;
     using Params;
+    using Microsoft.AspNetCore.Authorization;
 
     public class UserController : _BaseLifeCycleController
    {
@@ -18,6 +19,8 @@ namespace SocialMedia_LifeCycle.Controllers
             this.authService = authService;
         }
 
+        [HttpPost("NewAccount")]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateNewAccount([FromBody] UserCredentials userCredentials)
         {
             if(!ModelState.IsValid)
@@ -27,7 +30,7 @@ namespace SocialMedia_LifeCycle.Controllers
 
             try
             {
-                var user = authService.CreateNewAccount(userCredentials);
+                var user = await authService.CreateNewAccount(userCredentials);
                 return Ok(authService.ToList());
             }
             catch (Exception ex)
@@ -36,9 +39,15 @@ namespace SocialMedia_LifeCycle.Controllers
             }
         }
 
+        [HttpGet("get")]
         public IActionResult Get()
         {
             return Ok(authService.ToList());
+        }
+
+        public async Task<IActionResult> Login()
+        {
+            return Ok();
         }
    }
 }

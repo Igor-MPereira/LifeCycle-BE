@@ -12,5 +12,6 @@ namespace SocialMedia_LifeCycle.Shared.Services
     {
         IEnumerable<User> ToList();
         Task<object> CreateNewAccount(UserCredentials userCredentials);
+        //Task Authenticate();
     }
 }

@@ -20,7 +20,6 @@ namespace SocialMedia_LifeCycle
                 var tags = new List<string>
                 {
                     "Ciência",
-                    "Fofoca",
                     "Notícia",
                     "Conhecimentos Gerais",
                     "Celebridades",
@@ -71,7 +70,7 @@ namespace SocialMedia_LifeCycle
                 var hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                     user.Password,
                     salt,
-                    KeyDerivationPrf.HMACSHA1,
+                    KeyDerivationPrf.HMACSHA256,
                     10000,
                     256 / 8
                     ));

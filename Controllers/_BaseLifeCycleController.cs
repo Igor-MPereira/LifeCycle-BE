@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia_LifeCycle.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class _BaseLifeCycleController : ControllerBase
     {
