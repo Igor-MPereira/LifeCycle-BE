@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 namespace SocialMedia_LifeCycle.Shared.Services
 {
     using Domain.Models;
-    using Controllers.Params;
+    using Controllers.Requests;
+    using SocialMedia_LifeCycle.Domain.Response;
 
     public interface IAuthService
     {
         IEnumerable<User> ToList();
-        Task<object> CreateNewAccount(UserCredentials userCredentials);
-        //Task Authenticate();
+        Task<TokenResponse> CreateNewAccount(UserCredentials userCredentials);
+        Task<TokenResponse> RefreshAccessToken(RefreshTokenRequest refreshTokenInfo);
+        Task<TokenResponse> Login(string login, string password, string email);
+
     }
 }

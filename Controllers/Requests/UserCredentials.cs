@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SocialMedia_LifeCycle.Controllers.Params
+namespace SocialMedia_LifeCycle.Controllers.Requests
 {
     public class UserCredentials
     {

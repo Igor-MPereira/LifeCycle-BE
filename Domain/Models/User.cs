@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SocialMedia_LifeCycle.Controllers.Params;
+using SocialMedia_LifeCycle.Controllers.Requests;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

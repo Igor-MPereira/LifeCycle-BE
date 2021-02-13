@@ -10,7 +10,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
     using Shared.Services;
     using SocialMedia_LifeCycle.DataAccessEF;
     using Domain.Models;
-    using Controllers.Params;
+    using Controllers.Requests;
     using SocialMedia_LifeCycle.Domain.Other;
     using System.Net;
     using System.Security.Cryptography;
@@ -38,9 +38,9 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return _context.Users.ToList();
         }
 
-        public async Task<TokenResponse> RefreshAccessToken(RefreshTokenInfo refrToken)
+        public async Task<TokenResponse> RefreshAccessToken(RefreshTokenRequest refrToken)
         {
-            var RToken = _context.RefreshTokenInfos.FirstOrDefault(r => r.RefreshToken == refrToken.RefreshToken && r.UserName == r.UserName);
+            var RToken = _context.RefreshTokenInfos.FirstOrDefault(r => r.RefreshToken.Equals(refrToken.RefreshToken) && r.UserName.Equals(r.UserName));
 
             if(RToken == null )
             {
@@ -58,9 +58,9 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return await GenerateAccessToken(RToken.UserName);
         }
 
-        public async Task<object> CreateNewAccount(UserCredentials userCredentials)
+        public async Task<TokenResponse> CreateNewAccount(UserCredentials userCredentials)
         {
-            var ValidateUser = await _context.Users.FirstOrDefaultAsync(u => u.Login == userCredentials.Login || u.Email == userCredentials.Email);
+            var ValidateUser = await _context.Users.FirstOrDefaultAsync(u => u.Login.Equals( userCredentials.Login) || u.Email.Equals(userCredentials.Email));
 
             if (ValidateUser != null && ValidateUser.Login == userCredentials.Login)
             {
@@ -83,7 +83,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return await GenerateAccessToken(user.Login);
         }
 
-        public async Task<TokenResponse> GenerateAccessToken(string userLogin)
+        private async Task<TokenResponse> GenerateAccessToken(string userLogin)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -113,7 +113,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
 
         public async Task<TokenResponse> Login(string login, string password, string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => ( user.Login == login || user.Email == email ));
+            var user = await _context.Users.FirstOrDefaultAsync(user => ( user.Login.Equals(login) || user.Email.Equals(email)));
 
             if ( user == null )
             {
@@ -128,7 +128,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return await GenerateAccessToken(user.Login);
         }
 
-        public ClaimsIdentity GetClaimsIdentity(string userLogin, DateTime? exp)
+        private ClaimsIdentity GetClaimsIdentity(string userLogin, DateTime? exp)
         {
             if ( exp == null ) exp = DateTime.UtcNow.AddMinutes(10);
 
@@ -148,7 +148,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return identity;
         }
 
-        public (string, string) NewPbkdf2EncryptedPassword(string password)
+        private (string, string) NewPbkdf2EncryptedPassword(string password)
         {
             var salt = new byte[128 / 8];
             using var rng = RandomNumberGenerator.Create();
@@ -166,7 +166,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return (hashedPassword, stringSalt);
         }
 
-        public bool ValidatePbkdf2Password(string inputPassword, string salt, string hashedPassword)
+        private bool ValidatePbkdf2Password(string inputPassword, string salt, string hashedPassword)
         {
             var decodedSubkey = Convert.FromBase64String(hashedPassword);
             var decodedSalt = Convert.FromBase64String(salt);
@@ -181,7 +181,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
             return CryptographicOperations.FixedTimeEquals(inputSubkey, decodedSubkey);
         }
 
-        public string GenerateRefreshToken()
+        private string GenerateRefreshToken()
         {
             var randomBytes = new byte[32];
             using var rng = RandomNumberGenerator.Create();

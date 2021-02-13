@@ -7,11 +7,13 @@ namespace SocialMedia_LifeCycle.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Shared.Services;
-    using Params;
+    using Requests;
     using Microsoft.AspNetCore.Authorization;
+    using SocialMedia_LifeCycle.Domain.Other;
 
+    [AllowAnonymous]
     public class UserController : _BaseLifeCycleController
-   {
+   {        
         private readonly IAuthService authService;
 
         public UserController(IAuthService authService)
@@ -20,7 +22,6 @@ namespace SocialMedia_LifeCycle.Controllers
         }
 
         [HttpPost("NewAccount")]
-        [AllowAnonymous]
         public async Task<IActionResult> CreateNewAccount([FromBody] UserCredentials userCredentials)
         {
             if(!ModelState.IsValid)
@@ -30,24 +31,62 @@ namespace SocialMedia_LifeCycle.Controllers
 
             try
             {
-                var user = await authService.CreateNewAccount(userCredentials);
-                return Ok(authService.ToList());
+                var tokenResponse = await authService.CreateNewAccount(userCredentials);
+                return Ok(tokenResponse);
             }
             catch (Exception ex)
             {
-                return Error("Algo deu errado!", ex);
+                if(ex is LifeCycleException lcEx)
+                {
+                    return Error(lcEx.Message, lcEx, 400);
+                }
+
+                return Error(_BaseErrorMessage + "criar sua conta!", ex);
             }
         }
 
-        [HttpGet("get")]
-        public IActionResult Get()
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginCredentials lCred)
         {
-            return Ok(authService.ToList());
+            try
+            {
+                var tokenResponse = await authService.Login(lCred.Login, lCred.Password, lCred.Email);
+                return Ok(tokenResponse);
+            }
+            catch (Exception ex)
+            {
+                if(ex is ArgumentException argEx)
+                {
+                    return Error(argEx.Message, argEx, 400);
+                }
+
+                return Error(_BaseErrorMessage + "efetuar login!", ex);
+            }
         }
 
-        public async Task<IActionResult> Login()
+        [HttpPost("Refresh")]
+        public async Task<IActionResult> Refresh(RefreshTokenRequest rTReq)
         {
-            return Ok();
+            try
+            {
+                var tokenResponse = authService.RefreshAccessToken(rTReq);
+                return Ok(tokenResponse);
+            }
+            catch ( Exception ex )
+            {
+                if(ex is ArgumentException argEx)
+                {
+                    //Investigate?
+                    return Error(_BaseErrorMessage + "renovar o token!", argEx);
+                } 
+
+                if(ex is LifeCycleException lcEx)
+                {
+                    return Error(lcEx.Message, lcEx, 400);
+                }
+
+                return Error(_BaseErrorMessage + "renovar o token!", ex);
+            }
         }
    }
 }

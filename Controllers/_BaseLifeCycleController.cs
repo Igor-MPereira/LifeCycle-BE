@@ -13,6 +13,7 @@ namespace SocialMedia_LifeCycle.Controllers
     [ApiController]
     public class _BaseLifeCycleController : ControllerBase
     {
+        protected readonly string _BaseErrorMessage = "Algo inesperado deu errado ao tentar ";
         public IActionResult Error(string message, Exception exception, int statusCode = 500)
         {
             return StatusCode(statusCode, new ErrorResponse()
