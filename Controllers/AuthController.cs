@@ -10,13 +10,15 @@ namespace SocialMedia_LifeCycle.Controllers
     using Requests;
     using Microsoft.AspNetCore.Authorization;
     using SocialMedia_LifeCycle.Domain.Other;
+    using Microsoft.AspNetCore.Http;
 
-    [AllowAnonymous]
-    public class UserController : _BaseLifeCycleController
-   {        
+    [ApiController]
+    public class AuthController : _BaseLifeCycleController
+    {
+        private readonly string CookieName = "LFwaRTCoSt";
         private readonly IAuthService authService;
 
-        public UserController(IAuthService authService)
+        public AuthController(IAuthService authService)
         {
             this.authService = authService;
         }
@@ -88,5 +90,19 @@ namespace SocialMedia_LifeCycle.Controllers
                 return Error(_BaseErrorMessage + "renovar o token!", ex);
             }
         }
-   }
+
+        private void setTokenCookie(RefreshTokenRequest rt)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(30),
+                Secure = true
+            };
+
+            Response.Cookies.Append(CookieName, rt.RefreshToken, cookieOptions);
+        }
+
+        //private ipaddress for further security
+    }
 }

@@ -20,6 +20,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
     using System.Text;
     using Microsoft.IdentityModel.Tokens;
     using System.Security.Claims;
+    using Microsoft.AspNetCore.Http;
 
     public class AuthService : IAuthService
     {
@@ -87,7 +88,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var exp = DateTime.UtcNow.AddMinutes(10);
+            var exp = DateTime.UtcNow.AddMinutes(1);
             
             var key = Encoding.ASCII.GetBytes(_config.GetValue<string>("SecretKey"));
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -99,6 +100,12 @@ namespace SocialMedia_LifeCycle.Domain.Services
 
             var accessToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
             var refreshToken = GenerateRefreshToken();
+            RefreshTokenInfo oldRefrToken = null;
+
+            if((oldRefrToken = await _context.RefreshTokenInfos.FirstOrDefaultAsync(r => r.UserName == userLogin)) != null) 
+            {
+                _context.RefreshTokenInfos.Remove(oldRefrToken);
+            }
 
             _context.RefreshTokenInfos.Add(new RefreshTokenInfo
             {
@@ -130,18 +137,9 @@ namespace SocialMedia_LifeCycle.Domain.Services
 
         private ClaimsIdentity GetClaimsIdentity(string userLogin, DateTime? exp)
         {
-            if ( exp == null ) exp = DateTime.UtcNow.AddMinutes(10);
-
-            var unixExp = exp.Value
-                .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                .TotalSeconds;
-
-            var roundedExp = Math.Round(unixExp).ToString();
-
             var identity = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Exp, roundedExp),
                     new Claim(JwtRegisteredClaimNames.Sub, userLogin)
                 });
 
@@ -188,7 +186,12 @@ namespace SocialMedia_LifeCycle.Domain.Services
 
             rng.GetBytes(randomBytes);
 
-            return Convert.ToBase64String(randomBytes);
-        }
+            var refToken = Convert.ToBase64String(randomBytes);
+
+            return refToken
+                .Replace("+", string.Empty)
+                .Replace("=", string.Empty)
+                .Replace("/", string.Empty);
+        }        
     }
 }

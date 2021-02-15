@@ -7,6 +7,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
 {
     using Shared.Services;
     using DataAccessEF;
+    using SocialMedia_LifeCycle.Domain.Models;
 
     public class TagService : ITagService
     {
@@ -15,6 +16,11 @@ namespace SocialMedia_LifeCycle.Domain.Services
         public TagService(LifeCycleContext context)
         {
             _context = context;
+        }
+
+        public IEnumerable<Tag> ToList()
+        {
+            return _context.Tags.ToList();
         }
     }
 }
