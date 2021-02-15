@@ -53,6 +53,9 @@ namespace SocialMedia_LifeCycle.Controllers
             try
             {
                 var tokenResponse = await authService.Login(lCred.Login, lCred.Password, lCred.Email);
+
+                setTokenCookie(tokenResponse.Value.RefreshToken);
+
                 return Ok(tokenResponse);
             }
             catch (Exception ex)
@@ -71,7 +74,11 @@ namespace SocialMedia_LifeCycle.Controllers
         {
             try
             {
-                var tokenResponse = authService.RefreshAccessToken(rTReq);
+                var token = rTReq.RefreshToken ?? Request.Headers[CookieName];
+                var tokenResponse = await authService.RefreshAccessToken(rTReq);
+
+                setTokenCookie(tokenResponse.Value.RefreshToken);
+
                 return Ok(tokenResponse);
             }
             catch ( Exception ex )
@@ -91,7 +98,7 @@ namespace SocialMedia_LifeCycle.Controllers
             }
         }
 
-        private void setTokenCookie(RefreshTokenRequest rt)
+        private void setTokenCookie(string rt)
         {
             var cookieOptions = new CookieOptions
             {
@@ -100,7 +107,7 @@ namespace SocialMedia_LifeCycle.Controllers
                 Secure = true
             };
 
-            Response.Cookies.Append(CookieName, rt.RefreshToken, cookieOptions);
+            Response.Cookies.Append(CookieName, rt, cookieOptions);
         }
 
         //private ipaddress for further security
