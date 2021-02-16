@@ -5,7 +5,7 @@ namespace SocialMedia_LifeCycle.Controllers.Requests
 {
     public class UserCredentials
     {
-        [Required, StringLength(32, MinimumLength = 4), RegularExpression(@"[a-zA-Z0-9\s._@]{4,32}")]
+        [Required, StringLength(32, MinimumLength = 5), RegularExpression(@"[a-zA-Z0-9\s._@]{4,32}")]
         public string Login { get; set; }
         [Required, DataType(DataType.EmailAddress), RegularExpression(@"[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}")]
         public string Email { get; set; }

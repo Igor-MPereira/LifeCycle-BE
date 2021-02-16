@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia_LifeCycle.Controllers
 {
+    [Authorize]
     [ApiController]
     public class TagsController : _BaseLifeCycleController
     {
@@ -19,7 +20,6 @@ namespace SocialMedia_LifeCycle.Controllers
         }
 
         [HttpGet("ToList")]
-        [Authorize]
 
         public IActionResult ToList()
         {

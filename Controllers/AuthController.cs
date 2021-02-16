@@ -104,7 +104,8 @@ namespace SocialMedia_LifeCycle.Controllers
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(30),
-                Secure = true
+                Secure = true,
+                SameSite = SameSiteMode.None
             };
 
             Response.Cookies.Append(CookieName, rt, cookieOptions);

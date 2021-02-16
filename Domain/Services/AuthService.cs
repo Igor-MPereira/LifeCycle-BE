@@ -88,7 +88,7 @@ namespace SocialMedia_LifeCycle.Domain.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var exp = DateTime.UtcNow.AddMinutes(1);
+            var exp = DateTime.UtcNow.AddMinutes(10);
             
             var key = Encoding.ASCII.GetBytes(_config.GetValue<string>("SecretKey"));
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -121,7 +121,6 @@ namespace SocialMedia_LifeCycle.Domain.Services
         public async Task<TokenResponse> Login(string login, string password, string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(user => ( user.Login.Equals(login) || user.Email.Equals(email)));
-
             if ( user == null )
             {
                 throw new ArgumentException(_BaseUserNotFoundMessage);
